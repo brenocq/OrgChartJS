@@ -1,0 +1,15 @@
+.nodeBlock{
+	display: table-cell;
+	background: #DDDDDD;
+	color: #000000;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #DDDDDD;
+	border-radius: 10px;
+	width: 150px;
+	height: 50px;
+	text-align: center;
+	vertical-align: middle;
+
+	box-shadow: 0 0 10px gray;
+}
