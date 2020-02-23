@@ -3,7 +3,7 @@ class OrgChart
 	constructor(orgChart, setup)
 	{
 		this.orgChart = orgChart;
-		$("#"+orgChart.id).css({position: 'relative'});
+		//$("#"+orgChart.id).css({position: 'relative'});
 		this.setup = setup;
 		this.update();
 	}
@@ -76,6 +76,12 @@ class OrgChart
 			nodeX.push(0);
 		}
 
+			document.getElementById("test").innerHTML+=
+			'<div id="nodeId3"class="draggable nodeBlock">\
+				<i class="orgChartNodeMove fa fa-arrows-alt"></i>\
+				<i class="orgChartNodeEdit fa fa-pencil"></i>\
+				<p class="orgChartNodeText">testing</p>\
+			</div>';
 		for(let n=0;n<nodes.length;n++)
 		{
 			let id = nodes[n].id;
@@ -97,13 +103,30 @@ class OrgChart
 				parentCurrWidth[node.pid] += currWidth;
 			}
 
-			orgChart.innerHTML+='<div id="'+nodeIdHTML+'"class="draggable droppable nodeBlock" draggable="true"\
-			ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="dragStart(event)">'+node.name+'</div>';
-			$("#"+nodeIdHTML).css('position', 'absolute');
-			$("#"+nodeIdHTML).css('top', parseInt(y-heightN/2)+'px');
-			$("#"+nodeIdHTML).css('left', parseInt(x-widthN/2)+'px');
-			$("#"+nodeIdHTML).width(widthN);
-			$("#"+nodeIdHTML).height(heightN);
+			//document.getElementById("test").innerHTML+=
+			orgChart.innerHTML+=
+			'<div id="'+nodeIdHTML+'"class="draggable nodeBlock">\
+				<i class="orgChartNodeMove fa fa-arrows-alt"></i>\
+				<i class="orgChartNodeEdit fa fa-pencil"></i>\
+				<p class="orgChartNodeText">'+node.name+'</p>\
+			</div>';
+
+			//$("#"+nodeIdHTML).css('position', 'absolute');
+			//$("#"+nodeIdHTML).css('top', parseInt(y-heightN/2)+'px');
+			//$("#"+nodeIdHTML).css('left', parseInt(x-widthN/2)+'px');
+			//$("#"+nodeIdHTML).width(widthN);
+			//$("#"+nodeIdHTML).height(heightN);
+
+			$("#"+nodeIdHTML).draggable({
+				handle: "i.orgChartNodeMove",
+				revert : function(event, ui) {
+					$(this).data("uiDraggable").originalPosition = {
+						top : 0,
+						left : 0
+					};
+					return !event;
+				}
+			});
 		}
 		this.drawLines();
 	}
@@ -145,7 +168,8 @@ class OrgChart
 											width:'+(cx-x).toString()+'px;\
 											border-top:'+lineStyle+';\
 											border-right:'+lineStyle+';\
-											border-radius:'+lineRadius+'px;"></div>'+orgChart.innerHTML;
+											border-radius:'+lineRadius+'px;\
+											z-index: -1;"></div>'+orgChart.innerHTML;
 				}else if(cx<x){
 					orgChart.innerHTML = '<div style="position:absolute;\
 											left:'+cx+'px;\
@@ -154,7 +178,8 @@ class OrgChart
 											width:'+(x-cx).toString()+'px;\
 											border-top:'+lineStyle+';\
 											border-left:'+lineStyle+';\
-											border-radius:'+lineRadius+'px;"></div>'+orgChart.innerHTML;
+											border-radius:'+lineRadius+'px;\
+											z-index: -1;"></div>'+orgChart.innerHTML;
 				}else{
 					orgChart.innerHTML = '<div style="position:absolute;\
 											left:'+x+'px;\
@@ -162,7 +187,8 @@ class OrgChart
 											height:'+(cy-y).toString()+'px;\
 											width:0px;\
 											border-left:'+lineStyle+';\
-											border-radius:'+lineRadius+'px;"></div>'+orgChart.innerHTML;
+											border-radius:'+lineRadius+'px;\
+											z-index: -1;"></div>'+orgChart.innerHTML;
 				}
 			}
 		}
@@ -262,8 +288,6 @@ class OrgChart
 		};
 
 		nodes.sort(byProperty("level"));
-
-		console.log(this.setup.nodes);
 	}
 }
 
@@ -278,15 +302,16 @@ function allowDrop(event) {
 
 function drop(event) {
 	event.preventDefault();
+	console.log(event);
  	var dragName = event.dataTransfer.getData("Text");
- 	var dropName = event.explicitOriginalTarget.id;
+ 	var dropName = event.originalTarget.id;
 	
 	var dragId = dragName.split(chart.orgChart.id)[1];
 	var dropId = dropName.split(chart.orgChart.id)[1];
 
+	console.log(dragId, dropId);
 	if(dragId && dropId)
 	{
-		console.log(dragId, dropId);
 		// Class parameters
 		let nodes = chart.setup.nodes;
 		let orgChart = chart.orgChart;
@@ -294,9 +319,7 @@ function drop(event) {
 
 		let node = chart.getNodeById(dragId);
 
-		console.log(nodes);
 		node.pid = parseInt(dropId); 
 		chart.update();
-		console.log(nodes);
 	}
 }

@@ -1,15 +1,56 @@
+body {
+	background: #EEEEEE;
+}
+
 .nodeBlock{
-	display: table-cell;
-	background: #DDDDDD;
+	display: grid;
+	grid-template-columns: 20px auto 20px; 
+	grid-template-rows: 20px auto;
+
+	background: #FFFFFF;
 	color: #000000;
 	border-style: solid;
 	border-width: 2px;
-	border-color: #DDDDDD;
+	border-color: #FFFFFF;
 	border-radius: 10px;
 	width: 150px;
 	height: 50px;
-	text-align: center;
-	vertical-align: middle;
 
-	box-shadow: 0 0 10px gray;
+	box-shadow: 0 5px 8px #AAAAAA;
+}
+
+.orgChartNodeMove{
+	grid-column-start: 1;
+	grid-column-end: span 1;
+	grid-row-start: 1;
+	grid-row-end: span 1;
+
+	height: 15px;
+	width: 15px;
+	
+	justify-self: center;
+	align-self: center;
+}
+
+.orgChartNodeEdit{
+	grid-column-start: 3;
+	grid-column-end: span 1;
+	grid-row-start: 1;
+	grid-row-end: span 1;
+
+	height: 15px;
+	width: 15px;
+
+	justify-self: center;
+	align-self: center;
+}
+
+.orgChartNodeText{
+	grid-column-start: 2;
+	grid-column-end: span 1;
+	grid-row-start: 1;
+	grid-row-end: span 2;
+
+	justify-self: center;
+	align-self: center;
 }
