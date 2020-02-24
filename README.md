@@ -1,21 +1,24 @@
 # OrgChartJS
 Organization Chart with create/edit/move features.
 
+<p align="center">
+<img src="img/orgChart.gif">
+</p>
 
 ## How to install
 Just put the css and js files on your folder and call them like:
-```
+``` html
 <link rel="stylesheet" type="text/css" href="../css/OrgChart.css">
 <script src="../js/OrgChart.js"></script>
 ```
 You also need to call jQuery and font-awesome.
 ## How to use
 First, you need to create a div with your chart id.
-```
+``` html
 <div id="myOrgChart"></div>
 ```
 After that, create the OrgChart object
-```
+``` js
 let chart;
 window.onload = function () {
      chart = new OrgChart(document.getElementById("myOrgChart"), {
