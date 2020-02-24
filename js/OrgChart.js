@@ -76,12 +76,6 @@ class OrgChart
 			nodeX.push(0);
 		}
 
-			document.getElementById("test").innerHTML+=
-			'<div id="nodeId3"class="draggable nodeBlock">\
-				<i class="orgChartNodeMove fa fa-arrows-alt"></i>\
-				<i class="orgChartNodeEdit fa fa-pencil"></i>\
-				<p class="orgChartNodeText">testing</p>\
-			</div>';
 		for(let n=0;n<nodes.length;n++)
 		{
 			let id = nodes[n].id;
@@ -104,29 +98,37 @@ class OrgChart
 			}
 
 			//document.getElementById("test").innerHTML+=
-			orgChart.innerHTML+=
-			'<div id="'+nodeIdHTML+'"class="draggable nodeBlock">\
-				<i class="orgChartNodeMove fa fa-arrows-alt"></i>\
-				<i class="orgChartNodeEdit fa fa-pencil"></i>\
-				<p class="orgChartNodeText">'+node.name+'</p>\
-			</div>';
+			let newNodeHTML = '';
+			newNodeHTML+='<div id="'+nodeIdHTML+'" name="'+nodeIdHTML+'" class="nodeBlock" ';
 
-			//$("#"+nodeIdHTML).css('position', 'absolute');
-			//$("#"+nodeIdHTML).css('top', parseInt(y-heightN/2)+'px');
-			//$("#"+nodeIdHTML).css('left', parseInt(x-widthN/2)+'px');
-			//$("#"+nodeIdHTML).width(widthN);
-			//$("#"+nodeIdHTML).height(heightN);
+			if(config.canMove)
+			{
+				newNodeHTML+='draggable="true" ondrop="drop(event)" ondragover="allowDrop(event)" ondragstart="dragStart(event)">';
+				newNodeHTML+='<i name="'+nodeIdHTML+'" class="orgChartNodeMove fa fa-arrows-alt"></i>'
+			}
+			else
+			{
+				newNodeHTML+='>';
+			}
+			if(config.canEdit)
+			{
+				newNodeHTML+='<i name="'+nodeIdHTML+'" class="orgChartNodeEdit fa fa-pencil" onclick="editNode('+nodeIdHTML+')"></i>'
+			}
+			if(config.canCreate)
+			{
+				newNodeHTML+='<i name="'+nodeIdHTML+'" class="orgChartNodeCreate fa fa-plus" onclick="createNode('+nodeIdHTML+')"></i>'
+			}
 
-			$("#"+nodeIdHTML).draggable({
-				handle: "i.orgChartNodeMove",
-				revert : function(event, ui) {
-					$(this).data("uiDraggable").originalPosition = {
-						top : 0,
-						left : 0
-					};
-					return !event;
-				}
-			});
+			newNodeHTML+=
+					'<span name="'+nodeIdHTML+'" class="orgChartNodeText">'+node.name+'</span></div>';
+
+			orgChart.innerHTML += newNodeHTML;
+
+			$("#"+nodeIdHTML).css('position', 'absolute');
+			$("#"+nodeIdHTML).css('top', parseInt(y-heightN/2)+'px');
+			$("#"+nodeIdHTML).css('left', parseInt(x-widthN/2)+'px');
+			$("#"+nodeIdHTML).width(widthN);
+			$("#"+nodeIdHTML).height(heightN);
 		}
 		this.drawLines();
 	}
@@ -289,10 +291,45 @@ class OrgChart
 
 		nodes.sort(byProperty("level"));
 	}
+
+	isChild(parent, child)
+	{
+		// Class parameters
+		let nodes = this.setup.nodes;
+		let orgChart = this.orgChart;
+		let config = this.setup.config;
+		let nodeList = this.nodeList;
+		
+		// Check children
+		for(let i=0;i<nodeList[parent].length;i++)
+		{
+			let id = nodeList[parent][i];
+			if(id==child)
+				return true;
+			else
+				if(this.isChild(id,child))
+					return true;
+		}
+
+		return false;
+	}
+
+	lastId()
+	{
+		let nodes = this.setup.nodes;
+		let maximumId = 0;
+		for(let i=0;i<nodes.length;i++)
+		{
+			let nodeId = nodes[i].id;
+			if(nodeId>maximumId)
+				maximumId = nodeId;
+		}
+		return maximumId;
+	}
 }
 
 function dragStart(event) {
-	var dragId = event.explicitOriginalTarget.id;
+	let dragId = event.originalTarget.id;
 	event.dataTransfer.setData("Text", dragId);
 }
 
@@ -302,15 +339,13 @@ function allowDrop(event) {
 
 function drop(event) {
 	event.preventDefault();
-	console.log(event);
  	var dragName = event.dataTransfer.getData("Text");
- 	var dropName = event.originalTarget.id;
+ 	var dropName = event.originalTarget.attributes[0].nodeValue;
 	
 	var dragId = dragName.split(chart.orgChart.id)[1];
 	var dropId = dropName.split(chart.orgChart.id)[1];
 
-	console.log(dragId, dropId);
-	if(dragId && dropId)
+	if(dragId && dropId && dragId!=dropId && !chart.isChild(dragId, dropId))
 	{
 		// Class parameters
 		let nodes = chart.setup.nodes;
@@ -322,4 +357,21 @@ function drop(event) {
 		node.pid = parseInt(dropId); 
 		chart.update();
 	}
+}
+
+//------------------ Edit these functions to your needs ----------------------//
+function createNode(parentIdHTML)
+{
+	console.log(parentIdHTML);
+
+	// Exemple adding node
+	let parentId = parentIdHTML.id.split(chart.orgChart.id)[1];
+	let nextId = chart.lastId()+1;
+	chart.setup.nodes.push({ id: nextId, pid: parentId, name: "New node" })
+	chart.update();
+}
+
+function editNode(nodeIdHTML)
+{
+	console.log(nodeIdHTML);
 }

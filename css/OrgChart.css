@@ -5,7 +5,7 @@ body {
 .nodeBlock{
 	display: grid;
 	grid-template-columns: 20px auto 20px; 
-	grid-template-rows: 20px auto;
+	grid-template-rows: 20px auto 20px;
 
 	background: #FFFFFF;
 	color: #000000;
@@ -30,6 +30,8 @@ body {
 	
 	justify-self: center;
 	align-self: center;
+
+	cursor: move;
 }
 
 .orgChartNodeEdit{
@@ -43,14 +45,31 @@ body {
 
 	justify-self: center;
 	align-self: center;
+
+	cursor: pointer;
 }
 
 .orgChartNodeText{
 	grid-column-start: 2;
 	grid-column-end: span 1;
 	grid-row-start: 1;
-	grid-row-end: span 2;
+	grid-row-end: span 1;
 
 	justify-self: center;
 	align-self: center;
+}
+
+.orgChartNodeCreate{
+	grid-column-start: 2;
+	grid-column-end: span 1;
+	grid-row-start: 3;
+	grid-row-end: span 1;
+
+	height: 15px;
+	width: 15px;
+
+	justify-self: center;
+	align-self: center;
+
+	cursor: pointer;
 }

@@ -14,18 +14,6 @@
 	</head>
 	<body>
 		<div id="myOrgChart"></div>
-		<div id="test" height="500" width="500">
-			<div id="nodeId" class="draggable nodeBlock">
-				<i class="orgChartNodeMove fa fa-arrows-alt"></i>
-				<i class="orgChartNodeEdit fa fa-pencil"></i>
-				<p class="orgChartNodeText">Testing</p>
-			</div>
-			<div id="nodeId2" class="draggable nodeBlock">
-				<i class="orgChartNodeMove fa fa-arrows-alt"></i>
-				<i class="orgChartNodeEdit fa fa-pencil"></i>
-				<p class="orgChartNodeText">Testing</p>
-			</div>
-		</div>
 
 	</body>
 
@@ -36,49 +24,13 @@
 
 	<!----- OrgChartJS ----->
 	<script>
-		document.getElementById("test").innerHTML+=
-		'<div id="nodeId3"class="draggable nodeBlock">\
-			<i class="orgChartNodeMove fa fa-arrows-alt"></i>\
-			<i class="orgChartNodeEdit fa fa-pencil"></i>\
-			<p class="orgChartNodeText">testing</p>\
-		</div>';
-
-		$("#nodeId3").draggable({
-			handle: "i.orgChartNodeMove",
-			revert : function(event, ui) {
-				$(this).data("uiDraggable").originalPosition = {
-					top : 0,
-					left : 0
-				};
-				return !event;
-			}
-		});
-		$("#nodeId2").draggable({
-			handle: "i.orgChartNodeMove",
-			revert : function(event, ui) {
-				$(this).data("uiDraggable").originalPosition = {
-					top : 0,
-					left : 0
-				};
-				return !event;
-			}
-		});
-		$("#nodeId").draggable({
-			handle: "i.orgChartNodeMove",
-			revert : function(event, ui) {
-				$(this).data("uiDraggable").originalPosition = {
-					top : 0,
-					left : 0
-				};
-				return !event;
-			}
-		});
-
 		let chart;
 		window.onload = function () { 
 			chart = new OrgChart(document.getElementById("myOrgChart"), {
 				config: {
-					enableDragDrop: true,
+					canEdit: true,
+					canMove: true,
+					canCreate: true,
 
 					height: 500,
 					width: 1500,
@@ -102,6 +54,5 @@
 				]
 			});
 		};
-	
 	</script>
 </html>
