@@ -3,8 +3,15 @@ class OrgChart
 	constructor(orgChart, setup)
 	{
 		this.orgChart = orgChart;
-		//$("#"+orgChart.id).css({position: 'relative'});
+		$("#"+orgChart.id).css({height: setup.config.height});
+		$("#"+orgChart.id).css({width: setup.config.width});
+		$("#"+orgChart.id).css({overflow: "scroll"});
+		$("#"+orgChart.id).css({position: "relative"});
+
 		this.setup = setup;
+		this.setup.config.height = $("#"+orgChart.id).height();
+		this.setup.config.width = $("#"+orgChart.id).width();
+		console.log(this.setup.config.height, this.setup.config.width);
 		this.update();
 	}
 
@@ -85,15 +92,18 @@ class OrgChart
 			let x = 0;
 			if(node.pid==null)
 			{
-				x = widthDiv/2+this.relativeX(node.id);
+				x = this.getRootX();
 				nodeX[node.id] = x;
 			}
 			else
 			{
 				let parentWidth = this.maximumWidth(node.pid);
 				let currWidth = this.maximumWidth(node.id);
-				x = nodeX[node.pid] - parentWidth/2 + parentCurrWidth[node.pid] + currWidth/2;// + this.relativeX(node.id);
-				nodeX[node.id] = nodeX[node.pid] - parentWidth/2 + parentCurrWidth[node.pid] + currWidth/2;
+				x = nodeX[node.pid]
+					- parentWidth/2
+					+ parentCurrWidth[node.pid]
+					+ currWidth/2;
+				nodeX[node.id] = x;
 				parentCurrWidth[node.pid] += currWidth;
 			}
 
@@ -143,6 +153,23 @@ class OrgChart
 		let lineStyle = "2px solid black";
 		let lineRadius = 20;
 
+		let minY = 0;
+		let minX = 0;
+		for(let n=0;n<nodes.length;n++)
+		{
+			let id = nodes[n].id;
+			let nodeIdHTML = orgChart.id+id;
+			let heightN = $("#"+nodeIdHTML).height();
+			let widthN = $("#"+nodeIdHTML).width();
+			let y = parseInt($("#"+nodeIdHTML).position().top);
+			let x = parseInt($("#"+nodeIdHTML).position().left);
+
+			if(y<minY)
+				minY=y
+			if(x<minX)
+				minX=x
+		}
+
 		for(let n=0;n<nodes.length;n++)
 		{
 			let id = nodes[n].id;
@@ -151,15 +178,15 @@ class OrgChart
 			let heightN = $("#"+nodeIdHTML).height();
 			let widthN = $("#"+nodeIdHTML).width();
 
-			let x = parseInt($("#"+nodeIdHTML).position().left+widthN/2);
-			let y = parseInt($("#"+nodeIdHTML).position().top+heightN/2);
+			let x = parseInt($("#"+nodeIdHTML).position().left+widthN/2)-minX;
+			let y = parseInt($("#"+nodeIdHTML).position().top+heightN/2)-minY;
 
 			for(let i=0;i<this.nodeList[id].length;i++)
 			{
 				let cid = this.nodeList[id][i];
 				let childNodeIdHTML = orgChart.id+cid;
-				let cx = parseInt($("#"+childNodeIdHTML).position().left+widthN/2);
-				let cy = parseInt($("#"+childNodeIdHTML).position().top+heightN/2);
+				let cx = parseInt($("#"+childNodeIdHTML).position().left+widthN/2)-minX;
+				let cy = parseInt($("#"+childNodeIdHTML).position().top+heightN/2)-minY;
 
 				if(cx>x)
 				{
@@ -255,6 +282,70 @@ class OrgChart
 			}
 		}
 
+	}
+
+	getRootX()
+	{
+		let config = this.setup.config;
+		let nodes = this.setup.nodes;
+		let nodeList = this.nodeList;
+		// Find root node
+		for(let n=0;n<nodes.length;n++)
+		{
+			let rootId = nodes[n].id;
+			let rootNode = this.getNodeById(rootId);
+			if(rootNode.pid==null)
+			{
+				if(nodeList[rootId].length>0)
+				{
+					let hasChild = true;
+
+					let nodeX = [];
+					let parentCurrWidth = []
+					for(let i=0;i<nodes.length;i++)
+					{
+						parentCurrWidth.push(0);
+						nodeX.push(0);
+					}
+
+					let minNodeX;
+					let id = nodeList[rootId][0];
+					let node = this.getNodeById(id);
+					let x = 0;
+					while(hasChild)
+					{
+						let parentWidth = this.maximumWidth(node.pid);
+						let currWidth = this.maximumWidth(node.id);
+						x = nodeX[node.pid]
+							- parentWidth/2
+							+ parentCurrWidth[node.pid]
+							+ currWidth/2;
+						nodeX[node.id] = x;
+						parentCurrWidth[node.pid] += currWidth;
+						// Set next node
+						if(nodeList[id].length>0)
+						{
+							id = nodeList[id][0];
+							node = this.getNodeById(id);
+						}
+						else
+						{
+							hasChild = false;
+						}
+					}
+
+					x = -x+config.widthNode/2
+					let resultX = config.width/2;
+					if(x>resultX)
+						resultX = x;
+					return resultX;
+				}
+				else
+				{
+					return config.width/2;
+				}
+			}
+		}
 	}
 
 	getNodeById(id)
@@ -362,7 +453,7 @@ function drop(event) {
 //------------------ Edit these functions to your needs ----------------------//
 function createNode(parentIdHTML)
 {
-	console.log(parentIdHTML);
+	//console.log(parentIdHTML);
 
 	// Exemple adding node
 	let parentId = parentIdHTML.id.split(chart.orgChart.id)[1];
@@ -373,5 +464,5 @@ function createNode(parentIdHTML)
 
 function editNode(nodeIdHTML)
 {
-	console.log(nodeIdHTML);
+	//console.log(nodeIdHTML);
 }
